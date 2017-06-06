@@ -540,15 +540,21 @@ void ComputationProver::compute_exo_compute(FILE *pws_file) {
     compute_exo_compute_getL(outVarsStr, pws_file, cmds);
 
     // now prepare the string we will send to stdin of the process
+    /*format:
+    <<number of input arrays>>
+    <<input_array_size>> <<input_elems...>>
+    ...
+    ...	
+    */
     std::stringstream procIn;
+    procIn << inVarsStr.size() << endl;
     for (std::vector< std::vector<std::string> >::iterator it = inVarsStr.begin(); it != inVarsStr.end(); it++) {
-        procIn << "[ ";
+        procIn << it->size() << " ";
         for (std::vector<std::string>::iterator jt = (*it).begin(); jt != (*it).end(); jt++) {
             mpq_t &vval = voc((*jt).c_str(), temp_q);
-            procIn << mpz_get_str(cmds,10,mpq_numref(vval)) << '%';
-            procIn << mpz_get_str(cmds,10,mpq_denref(vval)) << ' ';
+            procIn << mpz_get_str(cmds,10,mpq_numref(vval)) << ' ';
         }
-        procIn << "] ";
+	procIn << endl;
     }
     std::string procInStr = procIn.str();
 
